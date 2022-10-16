@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Favourites");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("History");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Favourites");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("History");
             this.searchbar = new System.Windows.Forms.TextBox();
             this.searchbarButton = new System.Windows.Forms.Button();
             this.OutputDataBox = new System.Windows.Forms.TextBox();
@@ -38,24 +38,23 @@
             this.bookmarks = new System.Windows.Forms.TreeView();
             this.btnBookmarsAddFavourite = new System.Windows.Forms.Button();
             this.btnBookmarksDelete = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.statusStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // searchbar
             // 
-            this.searchbar.Location = new System.Drawing.Point(18, 18);
-            this.searchbar.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.searchbar.Location = new System.Drawing.Point(67, 12);
             this.searchbar.Name = "searchbar";
-            this.searchbar.Size = new System.Drawing.Size(1166, 26);
+            this.searchbar.Size = new System.Drawing.Size(724, 20);
             this.searchbar.TabIndex = 0;
-            this.searchbar.TextChanged += new System.EventHandler(this.Searchbar_TextChanged);
+            this.searchbar.KeyUp += new System.Windows.Forms.KeyEventHandler(this.searchbar_KeyUp);
             // 
             // searchbarButton
             // 
-            this.searchbarButton.Location = new System.Drawing.Point(1196, 17);
-            this.searchbarButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.searchbarButton.Location = new System.Drawing.Point(797, 11);
             this.searchbarButton.Name = "searchbarButton";
-            this.searchbarButton.Size = new System.Drawing.Size(112, 32);
+            this.searchbarButton.Size = new System.Drawing.Size(75, 21);
             this.searchbarButton.TabIndex = 2;
             this.searchbarButton.Text = "search";
             this.searchbarButton.UseVisualStyleBackColor = true;
@@ -65,13 +64,12 @@
             // 
             this.OutputDataBox.AcceptsReturn = true;
             this.OutputDataBox.AcceptsTab = true;
-            this.OutputDataBox.Location = new System.Drawing.Point(285, 52);
-            this.OutputDataBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.OutputDataBox.Location = new System.Drawing.Point(190, 34);
             this.OutputDataBox.Multiline = true;
             this.OutputDataBox.Name = "OutputDataBox";
             this.OutputDataBox.ReadOnly = true;
             this.OutputDataBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.OutputDataBox.Size = new System.Drawing.Size(1023, 687);
+            this.OutputDataBox.Size = new System.Drawing.Size(683, 448);
             this.OutputDataBox.TabIndex = 3;
             // 
             // statusStrip
@@ -79,40 +77,40 @@
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ssStatus});
-            this.statusStrip.Location = new System.Drawing.Point(0, 1139);
+            this.statusStrip.Location = new System.Drawing.Point(0, 668);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Padding = new System.Windows.Forms.Padding(2, 0, 21, 0);
-            this.statusStrip.Size = new System.Drawing.Size(1326, 32);
+            this.statusStrip.Size = new System.Drawing.Size(884, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
             // 
             // ssStatus
             // 
             this.ssStatus.Name = "ssStatus";
-            this.ssStatus.Size = new System.Drawing.Size(81, 25);
+            this.ssStatus.Size = new System.Drawing.Size(52, 17);
             this.ssStatus.Text = "200 (OK)";
             // 
             // bookmarks
             // 
-            this.bookmarks.Location = new System.Drawing.Point(18, 52);
+            this.bookmarks.Location = new System.Drawing.Point(12, 34);
+            this.bookmarks.Margin = new System.Windows.Forms.Padding(2);
             this.bookmarks.Name = "bookmarks";
-            treeNode3.Name = "";
-            treeNode3.Text = "Favourites";
-            treeNode4.Name = "";
-            treeNode4.Text = "History";
+            treeNode1.Name = "";
+            treeNode1.Text = "Favourites";
+            treeNode2.Name = "";
+            treeNode2.Text = "History";
             this.bookmarks.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode3,
-            treeNode4});
-            this.bookmarks.Size = new System.Drawing.Size(249, 498);
+            treeNode1,
+            treeNode2});
+            this.bookmarks.Size = new System.Drawing.Size(167, 325);
             this.bookmarks.TabIndex = 5;
-            this.bookmarks.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.bookmarks_AfterSelect);
             this.bookmarks.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.bookmarks_NodeMouseDoubleClick);
             // 
             // btnBookmarsAddFavourite
             // 
-            this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(18, 556);
+            this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(12, 361);
+            this.btnBookmarsAddFavourite.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarsAddFavourite.Name = "btnBookmarsAddFavourite";
-            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(75, 33);
+            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(50, 21);
             this.btnBookmarsAddFavourite.TabIndex = 6;
             this.btnBookmarsAddFavourite.Text = "ATF";
             this.btnBookmarsAddFavourite.UseVisualStyleBackColor = true;
@@ -120,19 +118,31 @@
             // 
             // btnBookmarksDelete
             // 
-            this.btnBookmarksDelete.Location = new System.Drawing.Point(100, 556);
+            this.btnBookmarksDelete.Location = new System.Drawing.Point(67, 361);
+            this.btnBookmarksDelete.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarksDelete.Name = "btnBookmarksDelete";
-            this.btnBookmarksDelete.Size = new System.Drawing.Size(75, 32);
+            this.btnBookmarksDelete.Size = new System.Drawing.Size(50, 21);
             this.btnBookmarksDelete.TabIndex = 7;
             this.btnBookmarksDelete.Text = "Del";
             this.btnBookmarksDelete.UseVisualStyleBackColor = true;
             this.btnBookmarksDelete.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnBookmarksDelete_MouseUp);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 12);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(50, 20);
+            this.button1.TabIndex = 8;
+            this.button1.Text = "Home";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1326, 1171);
+            this.ClientSize = new System.Drawing.Size(884, 690);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnBookmarksDelete);
             this.Controls.Add(this.btnBookmarsAddFavourite);
             this.Controls.Add(this.bookmarks);
@@ -140,7 +150,6 @@
             this.Controls.Add(this.OutputDataBox);
             this.Controls.Add(this.searchbarButton);
             this.Controls.Add(this.searchbar);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "Form1";
             this.Text = "Form1";
             this.statusStrip.ResumeLayout(false);
@@ -160,6 +169,7 @@
         private System.Windows.Forms.TreeView bookmarks;
         private System.Windows.Forms.Button btnBookmarsAddFavourite;
         private System.Windows.Forms.Button btnBookmarksDelete;
+        private System.Windows.Forms.Button button1;
     }
 }
 

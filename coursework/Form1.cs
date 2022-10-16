@@ -12,6 +12,8 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Net;   // WebRequest, WebResponse
 using System.IO;    // StreamReader
+using System.Xml;   // XmlDocument
+using System.Xml.Serialization; // XmlSerializer
 
 namespace coursework
 {
@@ -19,28 +21,61 @@ namespace coursework
     {
         private const string URLPattern = @"((https ?:\/\/)?w{3}\.(\w+[.-]*)+\.(com|co\.uk))";
         private const string HTTPPattern = @"(https?)";
+        private HomePage homePage;
 
         public Form1()
         {
             InitializeComponent();
+            homepageLoader();
         }
 
-        private void Searchbar_TextChanged(object sender, EventArgs e)
+        private HomePage loadHP()
         {
+            XmlDocument xdoc = new XmlDocument();
+            HomePage homePage;
 
+            try
+            {
+                // check if "settings file"
+                xdoc.Load(HomePage.HOME_SETTINGS_XML);
+                XmlSerializer xs = new XmlSerializer(typeof(HomePage));
+                FileStream fs = new FileStream(HomePage.HOME_SETTINGS_XML, FileMode.Open);
+                homePage = (HomePage)xs.Deserialize(fs);
+            }
+            catch (FileNotFoundException e)
+            {
+                // if not found, create one
+                homePage = new HomePage();
+                homePage.Uri = "null";
+
+                XmlSerializer t_xs = new XmlSerializer(typeof(HomePage));
+                StreamWriter sw = new StreamWriter(HomePage.HOME_SETTINGS_XML);
+                t_xs.Serialize(sw, homePage);
+                sw.Close();
+
+                // no need to deserialise it
+            }
+
+
+            return homePage;
+        }
+
+        private void homepageLoader()
+        {
+            homePage = loadHP();
+            handleSearch(homePage.useSetURI());
         }
 
         private void SearchbarButton_Click(object sender, EventArgs e)
         {
             handleSearch();
-            handleBookmarks(searchbar.Text);
         }
 
-        private void handleSearch()
+        private void handleSearch(String s)
         {
-            string url = searchbar.Text;
+            string url = s;
 
-            HttpWebResponse res = null;
+            HttpWebResponse res;
 
             try
             {
@@ -64,6 +99,12 @@ namespace coursework
 
                 OutputDataBox.Text = "ERR";
             }
+
+            handleBookmarks(s);
+        }
+        private void handleSearch()
+        {
+            handleSearch(searchbar.Text);
         }
 
         private void setssStatus(string s, Color c)
@@ -77,17 +118,23 @@ namespace coursework
             bookmarks.Nodes[index].Nodes.Add(s);
         }
 
-        private void bookmarks_AfterSelect(object sender, TreeViewEventArgs e)
-        {
-            
-        }
 
         private void bookmarks_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (bookmarks.SelectedNode.Text.Substring(0, 4).Equals("http"))
+            switch(e.Button)
             {
-                searchbar.Text = bookmarks.SelectedNode.Text;
-                handleSearch();
+                case MouseButtons.Left:
+                    if (bookmarks.SelectedNode.Text.Substring(0, 4).Equals("http"))
+                    {
+                        searchbar.Text = bookmarks.SelectedNode.Text;
+                        handleSearch();
+                    }
+                    break;
+                case MouseButtons.Right:
+                    NodeMenu uc = new NodeMenu();
+                    uc.Show();
+                    // MenuStrip.Show();
+                    break;
             }
         }
 
@@ -110,5 +157,49 @@ namespace coursework
 
             bookmarks.SelectedNode.Remove();
         }
+
+        public void deleteSelectedNode()
+        {
+            if (bookmarks.SelectedNode == null || bookmarks.SelectedNode == bookmarks.Nodes[0] || bookmarks.SelectedNode == bookmarks.Nodes[1])
+            {
+                return;
+            }
+
+            bookmarks.SelectedNode.Remove();
+        }
+
+        private void searchbar_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+                handleSearch();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            handleSearch(homePage.useSetURI());
+        }
+
+        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
+        {
+
+        }
     }
+
+    [Serializable]
+    public class HomePage
+    {
+        public string Uri { get; set; }
+        public const string default_uri = "https://www.hw.ac.uk/";
+        public const string HOME_SETTINGS_XML = "home.settings.xml";
+
+        public string useSetURI()
+        {
+            if (Uri == null || Uri.Equals("null"))
+            {
+                return default_uri;
+            }
+
+            return Uri;
+        }
+    };
 }
