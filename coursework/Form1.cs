@@ -32,7 +32,6 @@ namespace coursework
         private HomePage loadHP()
         {
             XmlDocument xdoc = new XmlDocument();
-            HomePage homePage;
 
             try
             {
@@ -71,9 +70,23 @@ namespace coursework
             handleSearch();
         }
 
+        private string stringToUri(string s)
+        {
+            const string HTTP = "http://";
+            const string HTTPS = "https://";
+            string uri = s;
+
+            if (!(s.Contains(HTTP) || s.Contains(HTTPS)))
+            {
+                uri = HTTPS + s;
+            }
+
+            return uri;
+        }
+
         private void handleSearch(String s)
         {
-            string url = s;
+            string url = stringToUri(s);
 
             HttpWebResponse res;
 
@@ -131,9 +144,6 @@ namespace coursework
                     }
                     break;
                 case MouseButtons.Right:
-                    NodeMenu uc = new NodeMenu();
-                    uc.Show();
-                    // MenuStrip.Show();
                     break;
             }
         }
@@ -181,7 +191,42 @@ namespace coursework
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
         {
+            // remove
+        }
 
+        private void bookmarks_MouseClick(object sender, MouseEventArgs e)
+        {
+            switch (e.Button)
+            {
+                case MouseButtons.Left:
+                    break;
+                case MouseButtons.Right:
+                    if (!(bookmarks.SelectedNode.Equals(bookmarks.Nodes[0]) || bookmarks.SelectedNode.Equals(bookmarks.Nodes[1])))
+                    {
+                        nodeMenu.Show(bookmarks, bookmarks.PointToClient(MousePosition));
+                    }
+                    break;
+            }
+        }
+
+        private void nodeMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            // remove
+        }
+
+        private void setHomeNode_Click(object sender, EventArgs e)
+        {
+            homePage.Uri = bookmarks.SelectedNode.Text;
+        }
+
+        private void addFavouriteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            handleBookmarks(bookmarks.SelectedNode.Text, 0);
+        }
+
+        private void deleteNode_Click(object sender, EventArgs e)
+        {
+            bookmarks.Nodes.Remove(bookmarks.SelectedNode);
         }
     }
 
@@ -200,6 +245,15 @@ namespace coursework
             }
 
             return Uri;
+        }
+
+        // deconstructor will be used to save/update settings file
+        ~HomePage()
+        {
+            XmlSerializer t_xs = new XmlSerializer(typeof(HomePage));
+            StreamWriter sw = new StreamWriter(HomePage.HOME_SETTINGS_XML);
+            t_xs.Serialize(sw, this);
+            sw.Close();
         }
     };
 }

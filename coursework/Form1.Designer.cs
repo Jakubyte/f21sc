@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Favourites");
             System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("History");
             this.searchbar = new System.Windows.Forms.TextBox();
@@ -39,7 +40,12 @@
             this.btnBookmarsAddFavourite = new System.Windows.Forms.Button();
             this.btnBookmarksDelete = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.nodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.deleteNode = new System.Windows.Forms.ToolStripMenuItem();
+            this.setHomeNode = new System.Windows.Forms.ToolStripMenuItem();
+            this.addFavouriteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip.SuspendLayout();
+            this.nodeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // searchbar
@@ -104,6 +110,7 @@
             this.bookmarks.Size = new System.Drawing.Size(167, 325);
             this.bookmarks.TabIndex = 5;
             this.bookmarks.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.bookmarks_NodeMouseDoubleClick);
+            this.bookmarks.MouseClick += new System.Windows.Forms.MouseEventHandler(this.bookmarks_MouseClick);
             // 
             // btnBookmarsAddFavourite
             // 
@@ -137,6 +144,37 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // nodeMenu
+            // 
+            this.nodeMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.deleteNode,
+            this.setHomeNode,
+            this.addFavouriteToolStripMenuItem});
+            this.nodeMenu.Name = "nodeMenu";
+            this.nodeMenu.Size = new System.Drawing.Size(149, 70);
+            this.nodeMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.nodeMenu_ItemClicked);
+            // 
+            // deleteNode
+            // 
+            this.deleteNode.Name = "deleteNode";
+            this.deleteNode.Size = new System.Drawing.Size(148, 22);
+            this.deleteNode.Text = "Delete";
+            this.deleteNode.Click += new System.EventHandler(this.deleteNode_Click);
+            // 
+            // setHomeNode
+            // 
+            this.setHomeNode.Name = "setHomeNode";
+            this.setHomeNode.Size = new System.Drawing.Size(148, 22);
+            this.setHomeNode.Text = "Set Home";
+            this.setHomeNode.Click += new System.EventHandler(this.setHomeNode_Click);
+            // 
+            // addFavouriteToolStripMenuItem
+            // 
+            this.addFavouriteToolStripMenuItem.Name = "addFavouriteToolStripMenuItem";
+            this.addFavouriteToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+            this.addFavouriteToolStripMenuItem.Text = "Add Favourite";
+            this.addFavouriteToolStripMenuItem.Click += new System.EventHandler(this.addFavouriteToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -154,6 +192,7 @@
             this.Text = "Form1";
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
+            this.nodeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -170,6 +209,10 @@
         private System.Windows.Forms.Button btnBookmarsAddFavourite;
         private System.Windows.Forms.Button btnBookmarksDelete;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ContextMenuStrip nodeMenu;
+        private System.Windows.Forms.ToolStripMenuItem deleteNode;
+        private System.Windows.Forms.ToolStripMenuItem setHomeNode;
+        private System.Windows.Forms.ToolStripMenuItem addFavouriteToolStripMenuItem;
     }
 }
 
