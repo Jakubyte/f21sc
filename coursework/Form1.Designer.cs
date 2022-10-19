@@ -44,6 +44,8 @@
             this.deleteNode = new System.Windows.Forms.ToolStripMenuItem();
             this.setHomeNode = new System.Windows.Forms.ToolStripMenuItem();
             this.addFavouriteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openBatch = new System.Windows.Forms.OpenFileDialog();
+            this.btnBatchDownload = new System.Windows.Forms.Button();
             this.statusStrip.SuspendLayout();
             this.nodeMenu.SuspendLayout();
             this.SuspendLayout();
@@ -117,7 +119,7 @@
             this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(12, 361);
             this.btnBookmarsAddFavourite.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarsAddFavourite.Name = "btnBookmarsAddFavourite";
-            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(50, 21);
+            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(78, 21);
             this.btnBookmarsAddFavourite.TabIndex = 6;
             this.btnBookmarsAddFavourite.Text = "ATF";
             this.btnBookmarsAddFavourite.UseVisualStyleBackColor = true;
@@ -125,10 +127,10 @@
             // 
             // btnBookmarksDelete
             // 
-            this.btnBookmarksDelete.Location = new System.Drawing.Point(67, 361);
+            this.btnBookmarksDelete.Location = new System.Drawing.Point(103, 361);
             this.btnBookmarksDelete.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarksDelete.Name = "btnBookmarksDelete";
-            this.btnBookmarksDelete.Size = new System.Drawing.Size(50, 21);
+            this.btnBookmarksDelete.Size = new System.Drawing.Size(76, 21);
             this.btnBookmarksDelete.TabIndex = 7;
             this.btnBookmarksDelete.Text = "Del";
             this.btnBookmarksDelete.UseVisualStyleBackColor = true;
@@ -175,11 +177,26 @@
             this.addFavouriteToolStripMenuItem.Text = "Add Favourite";
             this.addFavouriteToolStripMenuItem.Click += new System.EventHandler(this.addFavouriteToolStripMenuItem_Click);
             // 
+            // openBatch
+            // 
+            this.openBatch.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
+            // 
+            // btnBatchDownload
+            // 
+            this.btnBatchDownload.Location = new System.Drawing.Point(12, 387);
+            this.btnBatchDownload.Name = "btnBatchDownload";
+            this.btnBatchDownload.Size = new System.Drawing.Size(167, 23);
+            this.btnBatchDownload.TabIndex = 9;
+            this.btnBatchDownload.Text = "Batch Download";
+            this.btnBatchDownload.UseVisualStyleBackColor = true;
+            this.btnBatchDownload.Click += new System.EventHandler(this.btnBatchDownload_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 690);
+            this.Controls.Add(this.btnBatchDownload);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnBookmarksDelete);
             this.Controls.Add(this.btnBookmarsAddFavourite);
@@ -213,6 +230,8 @@
         private System.Windows.Forms.ToolStripMenuItem deleteNode;
         private System.Windows.Forms.ToolStripMenuItem setHomeNode;
         private System.Windows.Forms.ToolStripMenuItem addFavouriteToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openBatch;
+        private System.Windows.Forms.Button btnBatchDownload;
     }
 }
 

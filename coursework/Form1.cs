@@ -14,6 +14,7 @@ using System.Net;   // WebRequest, WebResponse
 using System.IO;    // StreamReader
 using System.Xml;   // XmlDocument
 using System.Xml.Serialization; // XmlSerializer
+using System.Threading; // multi-threading
 
 namespace coursework
 {
@@ -72,6 +73,7 @@ namespace coursework
 
         private string stringToUri(string s)
         {
+            // TODO : improve if statement, cannot garuantee that "http(s)://" is at the beginning
             const string HTTP = "http://";
             const string HTTPS = "https://";
             string uri = s;
@@ -84,7 +86,7 @@ namespace coursework
             return uri;
         }
 
-        private void handleSearch(String s)
+        private void handleSearch(string s)
         {
             string url = stringToUri(s);
 
@@ -96,7 +98,7 @@ namespace coursework
                 req.Method = "GET";
                 res = (HttpWebResponse)req.GetResponse();
                 StreamReader data = new StreamReader(res.GetResponseStream());
-                setssStatus("200 (OK)", Color.Green);
+                setssStatus("(200) OK", Color.Green);
 
                 OutputDataBox.Text = data.ReadToEnd();
             }
@@ -107,8 +109,15 @@ namespace coursework
 
                 MatchCollection errStatusCode = r.Matches(e.Message);
 
-                ssStatus.Text = errStatusCode[0].Value;
-                ssStatus.ForeColor = Color.Red;
+                if (errStatusCode.Count > 0)
+                {
+                    ssStatus.Text = errStatusCode[0].Value;
+                    ssStatus.ForeColor = Color.Red;
+                } else
+                {
+                    ssStatus.Text = e.Message;
+                    ssStatus.ForeColor = Color.Red;
+                }
 
                 OutputDataBox.Text = "ERR";
             }
@@ -228,6 +237,43 @@ namespace coursework
         {
             bookmarks.Nodes.Remove(bookmarks.SelectedNode);
         }
+
+        private void handleSearchThread(string s)
+        {
+            Console.WriteLine(s);
+        }
+
+        private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+        {
+            Console.WriteLine(openBatch.FileName);
+            FileStream fs = File.OpenRead(openBatch.FileName);
+            
+            // read into mem
+            byte[] raw = new byte[fs.Length];
+            fs.Read(raw, 0, raw.Length);
+            string s = Encoding.Default.GetString(raw);
+            string[] vs = s.Split(new char[] { ',', ' ', '\n' });
+
+            UrlRequest[] us = new UrlRequest[vs.Length];
+            ThreadStart tDelagate;
+            Thread[] ts = new Thread[vs.Length];
+
+            int i = 0;
+            OutputDataBox.Text = "";
+            foreach (string v in vs)
+            {
+                us[i] = new UrlRequest(v, OutputDataBox);
+                tDelagate = new ThreadStart(us[i].request);
+                ts[i] = new Thread(tDelagate);
+                ts[i].Start();
+                i++;
+            }
+        }
+
+        private void btnBatchDownload_Click(object sender, EventArgs e)
+        {
+            openBatch.ShowDialog();
+        }
     }
 
     [Serializable]
@@ -256,4 +302,48 @@ namespace coursework
             sw.Close();
         }
     };
+
+    public class UrlRequest
+    {
+        public UrlRequest(string url, TextBox t)
+        {
+            uri = url;
+            tb = t;
+        }
+
+        public string uri { get; set; }
+
+        //[ThreadStatic]
+        public string code;
+        public void request()
+        {
+            HttpWebResponse res;
+
+            try
+            {
+                WebRequest req = WebRequest.Create(uri);
+                req.Method = "GET";
+                res = (HttpWebResponse)req.GetResponse();
+                StreamReader data = new StreamReader(res.GetResponseStream());
+
+                code = "(200) OK";
+            }
+            catch (WebException e)
+            {
+                Console.WriteLine(e.Message);
+                Regex r = new Regex(@"(\(\d+\).+)");
+                MatchCollection errStatusCode = r.Matches(e.Message);
+
+                if (errStatusCode.Count > 0)
+                {
+                    code = errStatusCode[0].Value;
+                }
+            }
+
+            tb.BeginInvoke((Action)(() => tb.Text += Environment.NewLine + "[-" + uri + ": " + code + "-]"));
+        }
+
+        public string Code() { return code; }
+        private TextBox tb;
+    }
 }
