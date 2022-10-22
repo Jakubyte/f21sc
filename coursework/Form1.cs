@@ -22,48 +22,54 @@ namespace coursework
     {
         private const string URLPattern = @"((https ?:\/\/)?w{3}\.(\w+[.-]*)+\.(com|co\.uk))";
         private const string HTTPPattern = @"(https?)";
-        private HomePage homePage;
+        private Settings settings;
 
         public Form1()
         {
             InitializeComponent();
-            homepageLoader();
+            settingsLoader();
+            bookmarksLoader();
+            handleSearch(settings.useSetURI());
         }
 
-        private HomePage loadHP()
+        private void settingsLoader()
         {
             XmlDocument xdoc = new XmlDocument();
 
             try
             {
                 // check if "settings file"
-                xdoc.Load(HomePage.HOME_SETTINGS_XML);
-                XmlSerializer xs = new XmlSerializer(typeof(HomePage));
-                FileStream fs = new FileStream(HomePage.HOME_SETTINGS_XML, FileMode.Open);
-                homePage = (HomePage)xs.Deserialize(fs);
+                xdoc.Load(Settings.SETTINGS_XML);
+                XmlSerializer xs = new XmlSerializer(typeof(Settings));
+                FileStream fs = new FileStream(Settings.SETTINGS_XML, FileMode.Open);
+                settings = (Settings)xs.Deserialize(fs);
             }
             catch (FileNotFoundException e)
             {
                 // if not found, create one
-                homePage = new HomePage();
-                homePage.Uri = "null";
+                settings = new Settings();
+                settings.Uri = "null";
 
-                XmlSerializer t_xs = new XmlSerializer(typeof(HomePage));
-                StreamWriter sw = new StreamWriter(HomePage.HOME_SETTINGS_XML);
-                t_xs.Serialize(sw, homePage);
+                XmlSerializer t_xs = new XmlSerializer(typeof(Settings));
+                StreamWriter sw = new StreamWriter(Settings.SETTINGS_XML);
+                t_xs.Serialize(sw, settings);
                 sw.Close();
 
                 // no need to deserialise it
             }
-
-
-            return homePage;
         }
 
-        private void homepageLoader()
+        private void bookmarksLoader()
         {
-            homePage = loadHP();
-            handleSearch(homePage.useSetURI());
+            if (settings.History == null)
+            {
+                return;
+            }
+
+            foreach (string s in settings.History)
+            {
+                bookmarks.Nodes[1].Nodes.Add(s);
+            }
         }
 
         private void SearchbarButton_Click(object sender, EventArgs e)
@@ -138,6 +144,14 @@ namespace coursework
         private void handleBookmarks(string s, int index = 1)
         {
             bookmarks.Nodes[index].Nodes.Add(s);
+
+            if (index == 1)
+            {
+                settings.History.Add(s);
+                return;
+            }
+
+            settings.Favourites.Add(s);
         }
 
 
@@ -195,12 +209,7 @@ namespace coursework
 
         private void button1_Click(object sender, EventArgs e)
         {
-            handleSearch(homePage.useSetURI());
-        }
-
-        private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
-        {
-            // remove
+            handleSearch(settings.useSetURI());
         }
 
         private void bookmarks_MouseClick(object sender, MouseEventArgs e)
@@ -218,14 +227,9 @@ namespace coursework
             }
         }
 
-        private void nodeMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            // remove
-        }
-
         private void setHomeNode_Click(object sender, EventArgs e)
         {
-            homePage.Uri = bookmarks.SelectedNode.Text;
+            settings.Uri = bookmarks.SelectedNode.Text;
         }
 
         private void addFavouriteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -236,11 +240,6 @@ namespace coursework
         private void deleteNode_Click(object sender, EventArgs e)
         {
             bookmarks.Nodes.Remove(bookmarks.SelectedNode);
-        }
-
-        private void handleSearchThread(string s)
-        {
-            Console.WriteLine(s);
         }
 
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
@@ -276,12 +275,15 @@ namespace coursework
         }
     }
 
-    [Serializable]
-    public class HomePage
+    [XmlInclude(typeof(List<string>))]
+    public class Settings
     {
         public string Uri { get; set; }
+        public List<string> History { get; set; }
+        public List<string> Favourites { get; set; }
+
         public const string default_uri = "https://www.hw.ac.uk/";
-        public const string HOME_SETTINGS_XML = "home.settings.xml";
+        public const string SETTINGS_XML = "settings.xml";
 
         public string useSetURI()
         {
@@ -294,10 +296,10 @@ namespace coursework
         }
 
         // deconstructor will be used to save/update settings file
-        ~HomePage()
+        ~Settings()
         {
-            XmlSerializer t_xs = new XmlSerializer(typeof(HomePage));
-            StreamWriter sw = new StreamWriter(HomePage.HOME_SETTINGS_XML);
+            XmlSerializer t_xs = new XmlSerializer(typeof(Settings));
+            StreamWriter sw = new StreamWriter(Settings.SETTINGS_XML);
             t_xs.Serialize(sw, this);
             sw.Close();
         }
@@ -315,6 +317,7 @@ namespace coursework
 
         //[ThreadStatic]
         public string code;
+        public long size;
         public void request()
         {
             HttpWebResponse res;
@@ -326,6 +329,7 @@ namespace coursework
                 res = (HttpWebResponse)req.GetResponse();
                 StreamReader data = new StreamReader(res.GetResponseStream());
 
+                size = res.ContentLength;
                 code = "(200) OK";
             }
             catch (WebException e)
@@ -340,7 +344,7 @@ namespace coursework
                 }
             }
 
-            tb.BeginInvoke((Action)(() => tb.Text += Environment.NewLine + "[-" + uri + ": " + code + "-]"));
+            tb.BeginInvoke((Action)(() => tb.Text += Environment.NewLine + "[- [" + code + "] <" + size / 8 + "B> " + uri + "-]"));
         }
 
         public string Code() { return code; }

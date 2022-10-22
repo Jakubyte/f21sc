@@ -38,7 +38,6 @@
             this.ssStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.bookmarks = new System.Windows.Forms.TreeView();
             this.btnBookmarsAddFavourite = new System.Windows.Forms.Button();
-            this.btnBookmarksDelete = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.nodeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.deleteNode = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,15 +45,17 @@
             this.addFavouriteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openBatch = new System.Windows.Forms.OpenFileDialog();
             this.btnBatchDownload = new System.Windows.Forms.Button();
+            this.btnBack = new System.Windows.Forms.Button();
+            this.btnForward = new System.Windows.Forms.Button();
             this.statusStrip.SuspendLayout();
             this.nodeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // searchbar
             // 
-            this.searchbar.Location = new System.Drawing.Point(67, 12);
+            this.searchbar.Location = new System.Drawing.Point(190, 12);
             this.searchbar.Name = "searchbar";
-            this.searchbar.Size = new System.Drawing.Size(724, 20);
+            this.searchbar.Size = new System.Drawing.Size(566, 20);
             this.searchbar.TabIndex = 0;
             this.searchbar.KeyUp += new System.Windows.Forms.KeyEventHandler(this.searchbar_KeyUp);
             // 
@@ -116,31 +117,20 @@
             // 
             // btnBookmarsAddFavourite
             // 
-            this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(12, 361);
+            this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(761, 11);
             this.btnBookmarsAddFavourite.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarsAddFavourite.Name = "btnBookmarsAddFavourite";
-            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(78, 21);
+            this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(31, 21);
             this.btnBookmarsAddFavourite.TabIndex = 6;
             this.btnBookmarsAddFavourite.Text = "ATF";
             this.btnBookmarsAddFavourite.UseVisualStyleBackColor = true;
             this.btnBookmarsAddFavourite.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnBookmarsAddFavourite_MouseUp);
             // 
-            // btnBookmarksDelete
-            // 
-            this.btnBookmarksDelete.Location = new System.Drawing.Point(103, 361);
-            this.btnBookmarksDelete.Margin = new System.Windows.Forms.Padding(2);
-            this.btnBookmarksDelete.Name = "btnBookmarksDelete";
-            this.btnBookmarksDelete.Size = new System.Drawing.Size(76, 21);
-            this.btnBookmarksDelete.TabIndex = 7;
-            this.btnBookmarksDelete.Text = "Del";
-            this.btnBookmarksDelete.UseVisualStyleBackColor = true;
-            this.btnBookmarksDelete.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnBookmarksDelete_MouseUp);
-            // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(12, 12);
+            this.button1.Location = new System.Drawing.Point(124, 12);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(50, 20);
+            this.button1.Size = new System.Drawing.Size(55, 20);
             this.button1.TabIndex = 8;
             this.button1.Text = "Home";
             this.button1.UseVisualStyleBackColor = true;
@@ -154,7 +144,6 @@
             this.addFavouriteToolStripMenuItem});
             this.nodeMenu.Name = "nodeMenu";
             this.nodeMenu.Size = new System.Drawing.Size(149, 70);
-            this.nodeMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.nodeMenu_ItemClicked);
             // 
             // deleteNode
             // 
@@ -183,7 +172,7 @@
             // 
             // btnBatchDownload
             // 
-            this.btnBatchDownload.Location = new System.Drawing.Point(12, 387);
+            this.btnBatchDownload.Location = new System.Drawing.Point(12, 364);
             this.btnBatchDownload.Name = "btnBatchDownload";
             this.btnBatchDownload.Size = new System.Drawing.Size(167, 23);
             this.btnBatchDownload.TabIndex = 9;
@@ -191,14 +180,33 @@
             this.btnBatchDownload.UseVisualStyleBackColor = true;
             this.btnBatchDownload.Click += new System.EventHandler(this.btnBatchDownload_Click);
             // 
+            // btnBack
+            // 
+            this.btnBack.Location = new System.Drawing.Point(12, 12);
+            this.btnBack.Name = "btnBack";
+            this.btnBack.Size = new System.Drawing.Size(50, 20);
+            this.btnBack.TabIndex = 10;
+            this.btnBack.Text = "<-";
+            this.btnBack.UseVisualStyleBackColor = true;
+            // 
+            // btnForward
+            // 
+            this.btnForward.Location = new System.Drawing.Point(68, 12);
+            this.btnForward.Name = "btnForward";
+            this.btnForward.Size = new System.Drawing.Size(50, 20);
+            this.btnForward.TabIndex = 11;
+            this.btnForward.Text = "->";
+            this.btnForward.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(884, 690);
+            this.Controls.Add(this.btnForward);
+            this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnBatchDownload);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.btnBookmarksDelete);
             this.Controls.Add(this.btnBookmarsAddFavourite);
             this.Controls.Add(this.bookmarks);
             this.Controls.Add(this.statusStrip);
@@ -224,7 +232,6 @@
         private System.Windows.Forms.ToolStripStatusLabel ssStatus;
         private System.Windows.Forms.TreeView bookmarks;
         private System.Windows.Forms.Button btnBookmarsAddFavourite;
-        private System.Windows.Forms.Button btnBookmarksDelete;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ContextMenuStrip nodeMenu;
         private System.Windows.Forms.ToolStripMenuItem deleteNode;
@@ -232,6 +239,8 @@
         private System.Windows.Forms.ToolStripMenuItem addFavouriteToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openBatch;
         private System.Windows.Forms.Button btnBatchDownload;
+        private System.Windows.Forms.Button btnBack;
+        private System.Windows.Forms.Button btnForward;
     }
 }
 
