@@ -100,6 +100,7 @@
             // 
             // bookmarks
             // 
+            this.bookmarks.HideSelection = false;
             this.bookmarks.Location = new System.Drawing.Point(12, 34);
             this.bookmarks.Margin = new System.Windows.Forms.Padding(2);
             this.bookmarks.Name = "bookmarks";
@@ -188,6 +189,7 @@
             this.btnBack.TabIndex = 10;
             this.btnBack.Text = "<-";
             this.btnBack.UseVisualStyleBackColor = true;
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // btnForward
             // 
@@ -197,6 +199,7 @@
             this.btnForward.TabIndex = 11;
             this.btnForward.Text = "->";
             this.btnForward.UseVisualStyleBackColor = true;
+            this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
             // Form1
             // 

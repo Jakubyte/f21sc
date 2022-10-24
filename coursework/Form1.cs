@@ -23,6 +23,7 @@ namespace coursework
         private const string URLPattern = @"((https ?:\/\/)?w{3}\.(\w+[.-]*)+\.(com|co\.uk))";
         private const string HTTPPattern = @"(https?)";
         private Settings settings;
+        private TreeNode currentNode = null;
 
         public Form1()
         {
@@ -30,6 +31,7 @@ namespace coursework
             settingsLoader();
             bookmarksLoader();
             handleSearch(settings.useSetURI());
+            currentNode = bookmarks.Nodes[1].LastNode;
         }
 
         private void settingsLoader()
@@ -38,7 +40,7 @@ namespace coursework
 
             try
             {
-                // check if "settings file"
+                // check if "settings file" exists
                 xdoc.Load(Settings.SETTINGS_XML);
                 XmlSerializer xs = new XmlSerializer(typeof(Settings));
                 FileStream fs = new FileStream(Settings.SETTINGS_XML, FileMode.Open);
@@ -75,6 +77,7 @@ namespace coursework
         private void SearchbarButton_Click(object sender, EventArgs e)
         {
             handleSearch();
+            handleBookmarks(searchbar.Text);
         }
 
         private string stringToUri(string s)
@@ -127,8 +130,6 @@ namespace coursework
 
                 OutputDataBox.Text = "ERR";
             }
-
-            handleBookmarks(s);
         }
         private void handleSearch()
         {
@@ -148,6 +149,7 @@ namespace coursework
             if (index == 1)
             {
                 settings.History.Add(s);
+                currentNode = bookmarks.Nodes[1].LastNode;
                 return;
             }
 
@@ -183,6 +185,8 @@ namespace coursework
 
         private void btnBookmarksDelete_MouseUp(object sender, MouseEventArgs e)
         {
+            // remove
+
             if (bookmarks.SelectedNode == null || bookmarks.SelectedNode == bookmarks.Nodes[0] || bookmarks.SelectedNode == bookmarks.Nodes[1])
             {
                 return;
@@ -273,6 +277,49 @@ namespace coursework
         {
             openBatch.ShowDialog();
         }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            int i = bookmarks.Nodes[1].Nodes.IndexOf(currentNode) - 1;
+
+            if (i < 0)
+            {
+                return;
+            }
+
+            currentNode = bookmarks.Nodes[1].Nodes[i];
+
+            if (currentNode == null)
+            {
+                return;
+            }
+
+            searchbar.Text = currentNode.Text;
+            bookmarks.SelectedNode = currentNode;
+            handleSearch();
+        }
+
+        private void btnForward_Click(object sender, EventArgs e)
+        {
+            int i = bookmarks.Nodes[1].Nodes.IndexOf(currentNode) + 1;
+
+            if (i > bookmarks.Nodes[1].Nodes.Count - 1)
+            {
+                return;
+            }
+
+            currentNode = bookmarks.Nodes[1].Nodes[i];
+
+
+            if (currentNode == null)
+            {
+                return;
+            }
+
+            searchbar.Text = currentNode.Text;
+            bookmarks.SelectedNode = currentNode;
+            handleSearch();
+        }
     }
 
     [XmlInclude(typeof(List<string>))]
@@ -303,6 +350,7 @@ namespace coursework
             t_xs.Serialize(sw, this);
             sw.Close();
         }
+
     };
 
     public class UrlRequest
