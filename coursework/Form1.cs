@@ -14,14 +14,11 @@ using System.Net;   // WebRequest, WebResponse
 using System.IO;    // StreamReader
 using System.Xml;   // XmlDocument
 using System.Xml.Serialization; // XmlSerializer
-using System.Threading; // multi-threading
 
 namespace coursework
 {
     public partial class Form1 : Form
     {
-        private const string URLPattern = @"((https ?:\/\/)?w{3}\.(\w+[.-]*)+\.(com|co\.uk))";
-        private const string HTTPPattern = @"(https?)";
         private Settings settings;
         private TreeNode currentNode = null;
 
@@ -30,8 +27,14 @@ namespace coursework
             InitializeComponent();
             settingsLoader();
             bookmarksLoader();
-            handleSearch(settings.useSetURI());
+            reload(settings.useSetURI());
+            homeStatusLoader(settings.useSetURI());
             currentNode = bookmarks.Nodes[1].LastNode;
+        }
+
+        private void homeStatusLoader(string s)
+        {
+            ssHome.Text = "Home: " + s;
         }
 
         private void settingsLoader()
@@ -57,21 +60,31 @@ namespace coursework
                 t_xs.Serialize(sw, settings);
                 sw.Close();
 
+                settings.Favourites = new List<Settings.KeyVal<string, string>>();
+                settings.History = new List<string>();
+
                 // no need to deserialise it
             }
         }
 
         private void bookmarksLoader()
         {
-            if (settings.History == null)
+            if (settings.History != null)
             {
-                return;
+                foreach (string s in settings.History)
+                {
+                    bookmarks.Nodes[1].Nodes.Add(s);
+                }
             }
 
-            foreach (string s in settings.History)
+            if (settings.Favourites != null)
             {
-                bookmarks.Nodes[1].Nodes.Add(s);
+                foreach (Settings.KeyVal<string, string> kv in settings.Favourites)
+                {
+                    bookmarks.Nodes[0].Nodes.Add(kv.Key);
+                }
             }
+
         }
 
         private void SearchbarButton_Click(object sender, EventArgs e)
@@ -105,11 +118,13 @@ namespace coursework
             {
                 WebRequest req = WebRequest.Create(url);
                 req.Method = "GET";
-                res = (HttpWebResponse)req.GetResponse();
-                StreamReader data = new StreamReader(res.GetResponseStream());
-                setssStatus("(200) OK", Color.Green);
+                using (res = (HttpWebResponse)req.GetResponse())
+                {
+                    StreamReader data = new StreamReader(res.GetResponseStream());
+                    setssStatus("(200) OK", Color.Green);
 
-                OutputDataBox.Text = data.ReadToEnd();
+                    OutputDataBox.Text = data.ReadToEnd();
+                }
             }
             catch (WebException e)
             {
@@ -120,15 +135,18 @@ namespace coursework
 
                 if (errStatusCode.Count > 0)
                 {
-                    ssStatus.Text = errStatusCode[0].Value;
-                    ssStatus.ForeColor = Color.Red;
+                    setssStatus(errStatusCode[0].Value, Color.Red);
                 } else
                 {
-                    ssStatus.Text = e.Message;
-                    ssStatus.ForeColor = Color.Red;
+                    setssStatus(e.Message, Color.Red);
                 }
 
                 OutputDataBox.Text = "ERR";
+            }
+            catch (Exception e)
+            {
+                setssStatus("Invalid URI", Color.Red);
+                OutputDataBox.Text = e.Message;
             }
         }
         private void handleSearch()
@@ -153,7 +171,7 @@ namespace coursework
                 return;
             }
 
-            settings.Favourites.Add(s);
+            settings.Favourites.Add(new Settings.KeyVal<string, string> { Key = s, Value = s });
         }
 
 
@@ -162,10 +180,25 @@ namespace coursework
             switch(e.Button)
             {
                 case MouseButtons.Left:
-                    if (bookmarks.SelectedNode.Text.Substring(0, 4).Equals("http"))
+                    // navigate history
+                    if (bookmarks.SelectedNode.Parent == bookmarks.Nodes[1])
                     {
                         searchbar.Text = bookmarks.SelectedNode.Text;
                         handleSearch();
+                    }
+
+                    // navigate favourites - needs extra check and validation since nodes are renamable
+                    if (bookmarks.SelectedNode.Parent == bookmarks.Nodes[0])
+                    {
+                        Settings.KeyVal<string, string> kv = settings.Favourites.Find(x => x.Key == bookmarks.SelectedNode.Text);
+                        Console.WriteLine("Key {0}, Val {1}", kv.Key, kv.Value);
+                        
+                        if (kv == null)
+                        {
+                            return;
+                        }
+
+                        reload(kv.Value);
                     }
                     break;
                 case MouseButtons.Right:
@@ -183,17 +216,17 @@ namespace coursework
             handleBookmarks(searchbar.Text, 0);
         }
 
-        private void btnBookmarksDelete_MouseUp(object sender, MouseEventArgs e)
-        {
-            // remove
+        //private void btnBookmarksDelete_MouseUp(object sender, MouseEventArgs e)
+        //{
+        //    // remove
 
-            if (bookmarks.SelectedNode == null || bookmarks.SelectedNode == bookmarks.Nodes[0] || bookmarks.SelectedNode == bookmarks.Nodes[1])
-            {
-                return;
-            }
+        //    if (bookmarks.SelectedNode == null || bookmarks.SelectedNode == bookmarks.Nodes[0] || bookmarks.SelectedNode == bookmarks.Nodes[1])
+        //    {
+        //        return;
+        //    }
 
-            bookmarks.SelectedNode.Remove();
-        }
+        //    bookmarks.SelectedNode.Remove();
+        //}
 
         public void deleteSelectedNode()
         {
@@ -208,7 +241,9 @@ namespace coursework
         private void searchbar_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
-                handleSearch();
+            {
+                reload();
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -233,7 +268,15 @@ namespace coursework
 
         private void setHomeNode_Click(object sender, EventArgs e)
         {
-            settings.Uri = bookmarks.SelectedNode.Text;
+            string t = bookmarks.SelectedNode.Text;
+
+            if (bookmarks.SelectedNode.Parent == bookmarks.Nodes[0])
+            {
+                t = settings.Favourites.Find(x => x.Key.Equals(bookmarks.SelectedNode.Text)).Value;
+            }
+
+            settings.Uri = t;
+            homeStatusLoader(settings.useSetURI());
         }
 
         private void addFavouriteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -251,31 +294,53 @@ namespace coursework
             Console.WriteLine(openBatch.FileName);
             FileStream fs = File.OpenRead(openBatch.FileName);
             
+            if (fs == null)
+            {
+                return;
+            }
+
             // read into mem
             byte[] raw = new byte[fs.Length];
             fs.Read(raw, 0, raw.Length);
+
             string s = Encoding.Default.GetString(raw);
             string[] vs = s.Split(new char[] { ',', ' ', '\n' });
 
-            UrlRequest[] us = new UrlRequest[vs.Length];
-            ThreadStart tDelagate;
-            Thread[] ts = new Thread[vs.Length];
-
+            Task<string>[] requests = new Task<string>[vs.Length];
+            List<string> res = new List<string>();
             int i = 0;
             OutputDataBox.Text = "";
+
             foreach (string v in vs)
             {
-                us[i] = new UrlRequest(v, OutputDataBox);
-                tDelagate = new ThreadStart(us[i].request);
-                ts[i] = new Thread(tDelagate);
-                ts[i].Start();
+                requests[i] = Task.Run(() =>
+                {
+                    UrlRequest r = new UrlRequest(v);
+                    return r.Request();
+                });
+
                 i++;
             }
+
+            Task.WaitAll(requests);
+
+            for (i = 0;  i < requests.Length; ++i)
+            {
+                appendOutput(requests[i].Result);
+            }
+
+            fs.Close();
+        }
+
+        private void appendOutput(string s)
+        {
+            OutputDataBox.Text += s;
         }
 
         private void btnBatchDownload_Click(object sender, EventArgs e)
         {
             openBatch.ShowDialog();
+            openBatch.Dispose();
         }
 
         private void btnBack_Click(object sender, EventArgs e)
@@ -320,14 +385,67 @@ namespace coursework
             bookmarks.SelectedNode = currentNode;
             handleSearch();
         }
+
+        private void reload(string s)
+        {
+            handleSearch(s);
+            handleBookmarks(s);
+            this.Text = s;
+        }
+
+        private void reload()
+        {
+            reload(searchbar.Text);
+        }
+
+        //private void statusStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        //{
+        //    // remove
+        //}
+
+        //private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        //{
+        //    // remove
+        //}
+
+        //private void renameToolStripMenuItem_Click(object sender, EventArgs e)
+        //{
+        //    // remove
+        //}
+
+        //private void toolStripTextBox1_Click(object sender, EventArgs e)
+        //{
+        //    // remove
+        //}
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            if (toolStripTextBox1 == null || 
+                toolStripTextBox1.Equals("") || 
+                bookmarks.SelectedNode.Parent != bookmarks.Nodes[0])
+            {
+                return;
+            }
+
+            string prev = bookmarks.SelectedNode.Text;
+            bookmarks.SelectedNode.Text = toolStripTextBox1.Text;
+
+            settings.rename(prev, toolStripTextBox1.Text);
+        }
     }
 
     [XmlInclude(typeof(List<string>))]
     public class Settings
     {
+        public class KeyVal<_K, _V>
+        {
+            public _K Key { get; set; }
+            public _V Value { get; set; }
+        }
+
         public string Uri { get; set; }
         public List<string> History { get; set; }
-        public List<string> Favourites { get; set; }
+        public List<KeyVal<string, string>> Favourites { get; set; }
 
         public const string default_uri = "https://www.hw.ac.uk/";
         public const string SETTINGS_XML = "settings.xml";
@@ -342,6 +460,18 @@ namespace coursework
             return Uri;
         }
 
+        public void rename(string key, string to)
+        {
+
+            KeyVal<string, string> k = Favourites.Find(x => key.Equals(x.Key));
+            Favourites.Remove(k);
+
+            // make new key and insert
+            string v = k.Value;
+            k = new KeyVal<string, string> { Key = to, Value = v };
+            Favourites.Add(k);
+        }
+
         // deconstructor will be used to save/update settings file
         ~Settings()
         {
@@ -350,35 +480,68 @@ namespace coursework
             t_xs.Serialize(sw, this);
             sw.Close();
         }
-
     };
 
     public class UrlRequest
     {
-        public UrlRequest(string url, TextBox t)
+        public UrlRequest(string url)
         {
             uri = url;
-            tb = t;
         }
 
         public string uri { get; set; }
 
-        //[ThreadStatic]
-        public string code;
-        public long size;
-        public void request()
+        //public async Task<Response> GetAsync()
+        //{
+        //    string code = "";
+        //    long size = 0;
+
+        //    try
+        //    {
+        //        HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+        //        req.Method = "GET";
+
+        //        HttpWebResponse res = await req.GetResponseAsync() as HttpWebResponse;
+        //        StreamReader data = new StreamReader(res.GetResponseStream());
+        //        size = res.ContentLength;
+        //        code = "(200) OK";
+        //    } catch(WebException e)
+        //    {
+        //        Console.WriteLine(e.Message);
+        //        Regex r = new Regex(@"(\(\d+\).+)");
+        //        MatchCollection errStatusCode = r.Matches(e.Message);
+
+        //        if (errStatusCode.Count > 0)
+        //        {
+        //            code = errStatusCode[0].Value;
+        //        }
+        //    }
+
+        //    return new Response { uri = uri, code = code, size = size };
+        //}
+        //public async Task<string> RequestAsync()
+        //{
+
+        //    Response res = await GetAsync();
+        //    return Environment.NewLine + "[- [" + res.code + "] <" + res.size / 8 + "B> " + res.uri + "-]";
+        //}
+
+        public string Request()
         {
-            HttpWebResponse res;
+            string code = "";
+            long size = 0;
 
             try
             {
-                WebRequest req = WebRequest.Create(uri);
+                HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
                 req.Method = "GET";
-                res = (HttpWebResponse)req.GetResponse();
-                StreamReader data = new StreamReader(res.GetResponseStream());
 
-                size = res.ContentLength;
-                code = "(200) OK";
+                using (HttpWebResponse res = (HttpWebResponse)req.GetResponse())
+                {
+                    StreamReader data = new StreamReader(res.GetResponseStream());
+                    size = res.ContentLength;
+                    code = "(200) OK";
+                }
             }
             catch (WebException e)
             {
@@ -391,11 +554,18 @@ namespace coursework
                     code = errStatusCode[0].Value;
                 }
             }
+            catch (Exception ex)
+            {
+                code = ex.Message;
+            }
 
-            tb.BeginInvoke((Action)(() => tb.Text += Environment.NewLine + "[- [" + code + "] <" + size / 8 + "B> " + uri + "-]"));
+            return Environment.NewLine + "[- [" + code + "] <" + size / 8 + "B> " + uri + "-]";
         }
 
-        public string Code() { return code; }
-        private TextBox tb;
+        //public class Response{
+        //    public string uri { get; set;}
+        //    public string code { get; set;}
+        //    public long size { get; set; }
+        //}
     }
 }

@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Favourites");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("History");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Favourites");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("History");
             this.searchbar = new System.Windows.Forms.TextBox();
             this.searchbarButton = new System.Windows.Forms.Button();
             this.OutputDataBox = new System.Windows.Forms.TextBox();
@@ -47,6 +47,11 @@
             this.btnBatchDownload = new System.Windows.Forms.Button();
             this.btnBack = new System.Windows.Forms.Button();
             this.btnForward = new System.Windows.Forms.Button();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ssHome = new System.Windows.Forms.ToolStripStatusLabel();
+            this.renameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripTextBox1 = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip.SuspendLayout();
             this.nodeMenu.SuspendLayout();
             this.SuspendLayout();
@@ -85,12 +90,15 @@
             // 
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ssStatus});
-            this.statusStrip.Location = new System.Drawing.Point(0, 668);
+            this.ssStatus,
+            this.toolStripStatusLabel1,
+            this.ssHome});
+            this.statusStrip.Location = new System.Drawing.Point(0, 493);
             this.statusStrip.Name = "statusStrip";
             this.statusStrip.Size = new System.Drawing.Size(884, 22);
             this.statusStrip.TabIndex = 4;
             this.statusStrip.Text = "statusStrip1";
+            // this.statusStrip.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.statusStrip_ItemClicked);
             // 
             // ssStatus
             // 
@@ -104,13 +112,13 @@
             this.bookmarks.Location = new System.Drawing.Point(12, 34);
             this.bookmarks.Margin = new System.Windows.Forms.Padding(2);
             this.bookmarks.Name = "bookmarks";
-            treeNode1.Name = "";
-            treeNode1.Text = "Favourites";
-            treeNode2.Name = "";
-            treeNode2.Text = "History";
+            treeNode7.Name = "";
+            treeNode7.Text = "Favourites";
+            treeNode8.Name = "";
+            treeNode8.Text = "History";
             this.bookmarks.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2});
+            treeNode7,
+            treeNode8});
             this.bookmarks.Size = new System.Drawing.Size(167, 325);
             this.bookmarks.TabIndex = 5;
             this.bookmarks.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.bookmarks_NodeMouseDoubleClick);
@@ -118,12 +126,13 @@
             // 
             // btnBookmarsAddFavourite
             // 
+            this.btnBookmarsAddFavourite.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnBookmarsAddFavourite.Location = new System.Drawing.Point(761, 11);
             this.btnBookmarsAddFavourite.Margin = new System.Windows.Forms.Padding(2);
             this.btnBookmarsAddFavourite.Name = "btnBookmarsAddFavourite";
             this.btnBookmarsAddFavourite.Size = new System.Drawing.Size(31, 21);
             this.btnBookmarsAddFavourite.TabIndex = 6;
-            this.btnBookmarsAddFavourite.Text = "ATF";
+            this.btnBookmarsAddFavourite.Text = "*";
             this.btnBookmarsAddFavourite.UseVisualStyleBackColor = true;
             this.btnBookmarsAddFavourite.MouseUp += new System.Windows.Forms.MouseEventHandler(this.btnBookmarsAddFavourite_MouseUp);
             // 
@@ -142,9 +151,10 @@
             this.nodeMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.deleteNode,
             this.setHomeNode,
-            this.addFavouriteToolStripMenuItem});
+            this.addFavouriteToolStripMenuItem,
+            this.renameToolStripMenuItem});
             this.nodeMenu.Name = "nodeMenu";
-            this.nodeMenu.Size = new System.Drawing.Size(149, 70);
+            this.nodeMenu.Size = new System.Drawing.Size(181, 114);
             // 
             // deleteNode
             // 
@@ -201,11 +211,48 @@
             this.btnForward.UseVisualStyleBackColor = true;
             this.btnForward.Click += new System.EventHandler(this.btnForward_Click);
             // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+            this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            //this.toolStripStatusLabel1.Click += new System.EventHandler(this.toolStripStatusLabel1_Click);
+            // 
+            // ssHome
+            // 
+            this.ssHome.Name = "ssHome";
+            this.ssHome.Size = new System.Drawing.Size(65, 17);
+            this.ssHome.Text = "Set Home: ";
+            // 
+            // renameToolStripMenuItem
+            // 
+            this.renameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripTextBox1,
+            this.toolStripMenuItem1});
+            this.renameToolStripMenuItem.Name = "renameToolStripMenuItem";
+            this.renameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.renameToolStripMenuItem.Text = "Rename";
+            //this.renameToolStripMenuItem.Click += new System.EventHandler(this.renameToolStripMenuItem_Click);
+            // 
+            // toolStripTextBox1
+            // 
+            this.toolStripTextBox1.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.toolStripTextBox1.Name = "toolStripTextBox1";
+            this.toolStripTextBox1.Size = new System.Drawing.Size(100, 23);
+            //this.toolStripTextBox1.Click += new System.EventHandler(this.toolStripTextBox1_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem1.Text = "Rename";
+            this.toolStripMenuItem1.Click += new System.EventHandler(this.toolStripMenuItem1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(884, 690);
+            this.ClientSize = new System.Drawing.Size(884, 515);
             this.Controls.Add(this.btnForward);
             this.Controls.Add(this.btnBack);
             this.Controls.Add(this.btnBatchDownload);
@@ -244,6 +291,11 @@
         private System.Windows.Forms.Button btnBatchDownload;
         private System.Windows.Forms.Button btnBack;
         private System.Windows.Forms.Button btnForward;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel ssHome;
+        private System.Windows.Forms.ToolStripMenuItem renameToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
 
